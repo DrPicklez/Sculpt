@@ -1,6 +1,7 @@
 # Import libraries
 
 from random import seed
+from tkinter import Y
 from turtle import color
 import matplotlib.pyplot as plt
 from mpl_toolkits.mplot3d import Axes3D
@@ -190,7 +191,7 @@ class SculptureViewer():
         
         self.hugh = 0.
         self.seed = 1
-        self.octave = 1
+        self.octave = 2
         self.offsetNoiseX = 0.
         self.offsetNoiseY = 0.
 
@@ -211,8 +212,10 @@ class SculptureViewer():
         
 
         self.colorMan = GetColorFrom2DNoise(self.octave, self.seed)
+        self.colorMan.setRes(self.pointToPointX + 0.5, self.pointToPointY + 0.5, self.pointToPointZ)
 
         self.updatePlot(self.makeColors(self.hugh, self.offsetNoiseX, self.offsetNoiseY))
+        #v self.drawPlanes()
 
 
     def makeColors(self, hugh, _xOffset, _yOffset):
@@ -229,17 +232,25 @@ class SculptureViewer():
 
 #https://matplotlib.org/stable/gallery/mplot3d/pathpatch3d.html
     def updatePlot(self, colorArray):
-        #self.ax.clear()
+        self.ax.clear()
+        self.ax.scatter(self.points[:,0],self.points[:,1],self.points[:,2], s=500, color=colorArray, marker=self.marker)
+        self.ax.set_axis_off()
+    
+    def drawPlanes(self):
+        self.ax.clear()
+        for point in self.points:
+            x = point[0] /self.fig.get_figwidth()
+            y = point[1] /self.fig.get_figheight()
+            p = Rectangle((x,y), 0.5, 0.5, angle=0, rotation_point='center')
+            self.ax.add_patch(p)    
+            art3d.pathpatch_2d_to_3d(p, z=0.5, zdir="z")
+            
+            
+
         ## 
         #p = Circle((0.5, 0.5), 0.5)
         #self.ax.add_patch(p)
         #art3d.pathpatch_2d_to_3d(p, z=0, zdir="y")
-        
-        self.ax.scatter(self.points[:,0],self.points[:,1],self.points[:,2], s=500, color=colorArray, marker=self.marker)
-        # self.ax.contour(points[:,0],points[:,1],(points[:,2], points[:,2] + 20), extend3d=True, color=colorArray)
-        #self.ax.plot(points[:,0],points[:,1],points[:,2])
-        # self.ax.voxels(points[:,0],points[:,1],points[:,2], facecolors=colorArray, edgecolor='k')
-        self.ax.set_axis_off()
     
     def updateOctave(self, val):
         self.octave = int(val)
