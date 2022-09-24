@@ -1,0 +1,2 @@
+cd C:\Scripts\Bable\Images
+python -m http.server --bind 10.12.1.166 --directory . 8080

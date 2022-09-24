@@ -1,0 +1,10 @@
+adb shell am force-stop com.dominicharris.UE5_TowerOfBabel_Physical
+adb shell am start -n com.dominicharris.UE5_TowerOfBabel_Physical/com.epicgames.unreal.GameActivity
+adb install -r -g UE5_TowerOfBabel_Physical-arm64.apk
+adb pm grant com.dominicharris.UE5_TowerOfBabel_Physical android.permission.PACKAGE_USAGE_STATS
+
+
+debug
+C:\Users\will\AppData\Local\Android\Sdk\platform-tools\adb.exe -s 001e06511003 shell am start -n com.dominicharris.UE5_TowerOfBabel_Physical/com.epicgames.unreal.SplashActivity
+
+
