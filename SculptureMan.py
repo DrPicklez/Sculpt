@@ -1,6 +1,8 @@
 # Import libraries
 
+from math import dist
 from random import seed
+from statistics import multimode
 from tkinter import Y
 from turtle import color
 import matplotlib.pyplot as plt
@@ -174,11 +176,36 @@ class SculptureViewer():
         self.points = points
 
         self.pointToPointX = np.ptp(points[:,0])
-        print(self.pointToPointX)
+        self.minX = np.min(points[:,0])
+        self.maxX = np.max(points[:,0])
+        self.mutX = self.minX / self.maxX + 1.  #get multiplier for funnel
+        print(self.mutX)
+
         self.pointToPointY = np.ptp(points[:,1])
-        print(self.pointToPointY)
+        self.minY = np.min(points[:,1])
+        self.maxY = np.max(points[:,1])
+        self.mutY = self.minY / self.maxY + 1.  #get multiplier for funnel
+        print(self.mutY)
+
+        
         self.pointToPointZ = np.ptp(points[:,2])
         print(self.pointToPointZ)
+
+        #TOFIX
+        #make noise the width and height of the rise of the tower
+        #distMinX = dist((0, 0), (0,self.minX))
+        #distMinX /= self.pointToPointX
+        #distMinX += 1.
+        #distMinY = dist((0, 0), (0,self.minY))
+        #distMinY /= self.pointToPointY
+        #distMinY += 1.
+        #self.distMinX = distMinX
+        #self.distMinY = distMinY
+        #print(distMinX)
+        #print(distMinY)
+
+        # self.distMult = np.array([0, 0])
+        self.distMult = [self.minX, self.minY]
 
         self.fig = plt.figure(figsize=(10, 10))
         self.ax = plt.axes(projection='3d')
@@ -190,17 +217,18 @@ class SculptureViewer():
         offsetNoiseY = plt.axes([0.25, 0.075, 0.65, 0.03])
         
         self.hugh = 0.
-        self.seed = 1
+        self.seed = 99
         self.octave = 2
         self.offsetNoiseX = 0.
         self.offsetNoiseY = 0.
 
         self.s_hugh = Slider(hugh, 'Hugh', 0.01, 1., valinit=self.hugh)
-        self.s_octave = Slider(octave, 'Octaves', 1., 10, valinit=self.octave, valstep=1)
+        self.s_octave = Slider(octave, 'Octaves', 0, 12, valinit=self.octave, valstep=2)
         self.s_offsetNoiseX = Slider(offsetNoiseX, 'offsetNoiseX', 0., 1., valinit=self.offsetNoiseX)
         self.s_offsetNoiseY = Slider(offsetNoiseY, 'offsetNoiseY', 0., 1., valinit=self.offsetNoiseY)
+        
         self.s_hugh.on_changed(self.updateHugh)
-        self.s_octave.on_changed(self.updateOctave)
+        self.s_octave.on_changed(self.updateSeed)
         self.s_offsetNoiseX.on_changed(self.updateOffX)
         self.s_offsetNoiseY.on_changed(self.updateOffY)
 
@@ -220,13 +248,24 @@ class SculptureViewer():
 
     def makeColors(self, hugh, _xOffset, _yOffset):
         colorArray = []
-        normXN = []
         for poin in self.points:
-            normX = (poin[0] + (self.pointToPointX * 0.5)) #centreOffset
-            normY = (poin[1] + (self.pointToPointY * 0.5))
+            x = poin[0]
+            y = poin[1]
+
+            w = np.array([poin[0], poin[1]])
+            h = np.array([self.mutX, self.mutY])
+
+            w += h
+
+            #x*= (self.mutX + 1)
+            #y*= (self.mutY + 1)
+            
+            normX = (w[0] + (self.pointToPointX * 0.5)) #centreOffset
+            normY = (h[1] + (self.pointToPointY * 0.5))
+            
+
             self.colorMan.addOffset(_xOffset, _yOffset)
             col = self.colorMan.getColorRGB(normX, normY, hugh)
-            normXN.append((normX, normY))
             colorArray.append(col)
         return colorArray
 
@@ -244,14 +283,8 @@ class SculptureViewer():
             p = Rectangle((x,y), 0.5, 0.5, angle=0, rotation_point='center')
             self.ax.add_patch(p)    
             art3d.pathpatch_2d_to_3d(p, z=0.5, zdir="z")
-            
-            
-
-        ## 
-        #p = Circle((0.5, 0.5), 0.5)
-        #self.ax.add_patch(p)
-        #art3d.pathpatch_2d_to_3d(p, z=0, zdir="y")
     
+    #OCtave dont work well during runtime???
     def updateOctave(self, val):
         self.octave = int(val)
         self.colorMan = GetColorFrom2DNoise(self.octave, self.seed)
