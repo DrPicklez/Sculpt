@@ -217,7 +217,7 @@ class SculptureViewer():
         offsetNoiseY = plt.axes([0.25, 0.075, 0.65, 0.03])
         
         self.hugh = 0.
-        self.seed = 99
+        self.seed = 1
         self.octave = 2
         self.offsetNoiseX = 0.
         self.offsetNoiseY = 0.
@@ -252,16 +252,15 @@ class SculptureViewer():
             x = poin[0]
             y = poin[1]
 
+            w =(0., 0)
             w = np.array([poin[0], poin[1]])
             h = np.array([self.mutX, self.mutY])
+            w *= h
+            normX = (x+ w[0] + (self.pointToPointX * 0.5)) #centreOffset
+            normY = (y+ w[1] + (self.pointToPointY * 0.5))
 
-            w += h
-
-            #x*= (self.mutX + 1)
-            #y*= (self.mutY + 1)
-            
-            normX = (w[0] + (self.pointToPointX * 0.5)) #centreOffset
-            normY = (h[1] + (self.pointToPointY * 0.5))
+            #normX = (poin[0] + (self.pointToPointX * 0.5)) #centreOffset
+            #normY = (poin[1] + (self.pointToPointY * 0.5))
             
 
             self.colorMan.addOffset(_xOffset, _yOffset)
